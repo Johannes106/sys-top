@@ -40,7 +40,7 @@
             <input type="number" id="cpu-overload" />
           </div>
           <div class="form-control">
-            <label for="alert-frequency">Alert frequency (in minutes</label>
+            <label for="alert-frequency">Alert frequency (in minutes)</label>
             <input type="number" id="alert-frequency" />
           </div>
           <input type="submit" value="Save" class="btn" />
@@ -65,5 +65,39 @@
     </nav>
     <script src="js/tabs.js"></script>
     <script src="js/monitor.js"></script>
+    <script>
+      const settingsForm = document.getElementById('settings-form')
+
+      // get settings
+      ipcRenderer.on('settings:get', (e, settings) => {
+        document.getElementById('cpu-overload').value = settings.cpuOverload
+        document.getElementById('alert-frequency').value = settings.alertFrequency
+      })
+
+      // get settings (get it of the index.html)
+      settingsForm.addEventListener('submit', e => {
+        e.preventDefault()
+        const cpuOverload = document.getElementById('cpu-overload').value
+        const alertFrequency = document.getElementById('alert-frequency').value
+
+        // set settings (send it to the main.html)
+        ipcRenderer.send('settings:set', {
+          cpuOverload,
+          alertFrequency,
+        })
+        showAlert('Settings Saved')
+      })
+
+      function showAlert(msg) {
+        const alert = document.getElementById('alert')
+        alert.classList.remove('hide')
+        alert.classList.add('alert')
+        alert.innerText.msg
+
+        // remove alert after 3 sec
+        setTimeout(() => alert.classList.add('hide'), 3000)
+      }
+
+    </script>
   </body>
 </html>
