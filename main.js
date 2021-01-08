@@ -30,8 +30,8 @@ function createMainWindow() {
     height: 500,
     icon: './assets/icons/icon.png',
     resizable: isDev ? true : false,
-    show: true,
-    opacity: 0.9,
+    show: isMac ? false : true,
+    opacity: 0.95,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -47,31 +47,47 @@ function createMainWindow() {
 
 app.on('ready', () => {
   createMainWindow()
-
   mainWindow.webContents.on('dom-ready', () => {
     mainWindow.webContents.send('settings:get', store.get('settings'))
   }) 
 
+  // actions on the mainWindow
+  mainWindow.on('close',  (e) => {
+    if(!app.isQuitting === true) {
+      e.preventDefault()
+      mainWindow.hide()
+    }
+    return true;
+  })
 
   // create tray
-  // const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png')
-  // tray = new Tray(icon)
-  // const contextMenu = Menu.buildFromTemplate([
-  //   { label: 'Item1', type: 'radio' },
-  //   { label: 'Item2', type: 'radio' },
-  //   { label: 'Item3', type: 'radio', checked: true },
-  //   { label: 'Item4', type: 'radio' }
-  // ])
-  // tray.setContextMenu(contextMenu)
-  // tray.on('click', () => {
-  //   if(mainWindow.isVisible() === true) {
-  //     mainWindow.hide()
-  //   } else {
-  //     mainWindow.show()
-  //     tray.setToolTip('This is my application.')
-  //   }
-  // })
-
+  const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png')
+  tray = new Tray(icon)
+  // actions on the tray:
+  // left-click:
+  // Important: it is only the click on the tray (not on the close button)
+  tray.on('click', () => {
+    console.log(`Window is visible: ${mainWindow.isVisible()}`);
+    if(mainWindow.isVisible() === true) {
+      mainWindow.hide()
+    } else {
+      mainWindow.show()
+    }
+  })
+  // right-click
+  tray.on('right-click', () => {
+    const contextMenu = Menu.buildFromTemplate([
+      { 
+        label: "Quit", 
+        click: () => {
+          app.isQuitting = true,
+          app.quit()
+        } },
+    ]);
+    tray.setContextMenu(contextMenu);
+  
+  })
+  
 
   const mainMenu = Menu.buildFromTemplate(menu)
   Menu.setApplicationMenu(mainMenu)
