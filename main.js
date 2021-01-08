@@ -1,127 +1,102 @@
-const { app, Menu, ipcMain, Tray } = require('electron')
-const log = require('electron-log')
-const path = require('path')
-const Store = require('./Store')
-const MainWindow = require('./MainWindow')
+const { app, Menu, ipcMain } = require("electron");
+const path = require("path");
+const Store = require("./Store");
+const MainWindow = require("./MainWindow");
+const AppTray = require("./AppTray");
 
 // Set env
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = "development";
 
-const isDev = process.env.NODE_ENV !== 'production' ? true : false
-const isMac = process.platform === 'darwin' ? true : false
+const isDev = process.env.NODE_ENV !== "production" ? true : false;
+const isMac = process.platform === "darwin" ? true : false;
 
-let mainWindow
-let tray
+let mainWindow;
+let tray;
 
 // Init store
 const store = new Store({
-  configName: 'user-settings',
+  configName: "user-settings",
   defaults: {
     settings: {
       cpuOverload: 80,
       alertFrequency: 5,
     },
   },
-})
+});
 
 function createMainWindow() {
-  mainWindow = new MainWindow('./app/index.html', isDev, isMac)
+  mainWindow = new MainWindow("./app/index.html", isDev, isMac);
 }
 
-app.on('ready', () => {
-  createMainWindow()
-  mainWindow.webContents.on('dom-ready', () => {
-    mainWindow.webContents.send('settings:get', store.get('settings'))
-  }) 
+app.on("ready", () => {
+  createMainWindow();
+  mainWindow.webContents.on("dom-ready", () => {
+    mainWindow.webContents.send("settings:get", store.get("settings"));
+  });
 
   // actions on the mainWindow
-  mainWindow.on('close',  (e) => {
-    if(!app.isQuitting === true) {
-      e.preventDefault()
-      mainWindow.hide()
+  mainWindow.on("close", (e) => {
+    if (!app.isQuitting === true) {
+      e.preventDefault();
+      mainWindow.hide();
     }
     return true;
-  })
+  });
 
   // create tray
-  const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png')
-  tray = new Tray(icon)
-  // actions on the tray:
-  // left-click:
-  // Important: it is only the click on the tray (not on the close button)
-  tray.on('click', () => {
-    console.log(`Window is visible: ${mainWindow.isVisible()}`);
-    if(mainWindow.isVisible() === true) {
-      mainWindow.hide()
-    } else {
-      mainWindow.show()
-    }
-  })
-  // right-click
-  tray.on('right-click', () => {
-    const contextMenu = Menu.buildFromTemplate([
-      { 
-        label: "Quit", 
-        click: () => {
-          app.isQuitting = true,
-          app.quit()
-        } },
-    ]);
-    tray.setContextMenu(contextMenu);
-  
-  })
-  
+  const icon = path.join(__dirname, "assets", "icons", "tray_icon.png");
+  tray = new AppTray(icon, mainWindow);
 
-  const mainMenu = Menu.buildFromTemplate(menu)
-  Menu.setApplicationMenu(mainMenu)
-})
+  const mainMenu = Menu.buildFromTemplate(menu);
+  Menu.setApplicationMenu(mainMenu);
+});
 
 const menu = [
-  ...(isMac ? [{ role: 'appMenu' }] : []),
+  ...(isMac ? [{ role: "appMenu" }] : []),
   {
-    role: 'fileMenu',
+    role: "fileMenu",
   },
   {
-    label: 'View',
+    label: "View",
     submenu: [
       {
-        label: 'Toggle Navigation',
-        click: () => mainWindow.send('nav:toggle'),
-      }
-    ]
+        label: "Toggle Navigation",
+        click: () => mainWindow.send("nav:toggle"),
+      },
+    ],
   },
   ...(isDev
     ? [
         {
-          label: 'Developer',
+          label: "Developer",
           submenu: [
-            { role: 'reload' },
-            { role: 'forcereload' },
-            { type: 'separator' },
-            { role: 'toggledevtools' },
+            { role: "reload" },
+            { role: "forcereload" },
+            { type: "separator" },
+            { role: "toggledevtools" },
           ],
         },
       ]
     : []),
-]
+];
 
 // set settings
-ipcMain.on('settings:set', (e, value) => {
-  store.set('settings', value)
+ipcMain.on("settings:set", (e, value) => {
+  store.set("settings", value);
   // get current value and set it
-  mainWindow.webContents.send("settings:get", store.get('settings'))
-})
+  mainWindow.webContents.send("settings:get", store.get("settings"));
+});
 
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   if (!isMac) {
-    app.quit()
+    app.quit();
   }
-})
+});
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow()
+    createMainWindow();
   }
-})
+});
 
-app.allowRendererProcessReuse = true
+app.allowRendererProcessReuse = true;
