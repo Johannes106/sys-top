@@ -6,8 +6,9 @@ const Store = require('./Store')
 // Set env
 process.env.NODE_ENV = 'development'
 
-const isDev = process.env.NODE_ENV !== 'production' ? true : false
-const isMac = process.platform === 'darwin' ? true : false
+const isDev = process.env.NODE_ENV !== "production" ? true : false;
+const isMac = process.platform === "darwin" ? true : false;
+const isLinux = process.platform === "linux" ? true : false;
 
 let mainWindow
 let tray
@@ -45,33 +46,23 @@ function createMainWindow() {
   mainWindow.loadFile('./app/index.html')
 }
 
-app.on('ready', () => {
-  createMainWindow()
+app.on("ready", () => {
+  createMainWindow();
+  mainWindow.webContents.on("dom-ready", () => {
+    mainWindow.webContents.send("settings:get", store.get("settings"));
+  });
 
-  mainWindow.webContents.on('dom-ready', () => {
-    mainWindow.webContents.send('settings:get', store.get('settings'))
-  }) 
-
-
-  // create tray
-  // const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png')
-  // tray = new Tray(icon)
-  // const contextMenu = Menu.buildFromTemplate([
-  //   { label: 'Item1', type: 'radio' },
-  //   { label: 'Item2', type: 'radio' },
-  //   { label: 'Item3', type: 'radio', checked: true },
-  //   { label: 'Item4', type: 'radio' }
-  // ])
-  // tray.setContextMenu(contextMenu)
-  // tray.on('click', () => {
-  //   if(mainWindow.isVisible() === true) {
-  //     mainWindow.hide()
-  //   } else {
-  //     mainWindow.show()
-  //     tray.setToolTip('This is my application.')
-  //   }
-  // })
-
+  // actions on the mainWindow
+  mainWindow.on("close", (e) => {
+    if(isLinux) {
+      console.log("Oh, you are on Linux and there the feature with the tray is not working!")
+    } else 
+    if (!app.isQuitting === true) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+    return true;
+  });
 
   const mainMenu = Menu.buildFromTemplate(menu)
   Menu.setApplicationMenu(mainMenu)
