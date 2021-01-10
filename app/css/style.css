@@ -19,6 +19,7 @@ body {
 	justify-content: center;
 	min-height: 100vh;
 	margin: 0;
+	list-style-type: none;
 }
 
 ul {
@@ -39,9 +40,12 @@ ul {
 }
 
 .content li {
+	list-style-type: none;
 	padding: 10px 0;
 	border-bottom: 1px #555 solid;
 	background: var(--secondary-background-color);
+	/* margin-left: 20px; */
+	padding-left: 5px;
 }
 
 .content.show {
@@ -124,8 +128,13 @@ nav ul li p {
 
 .form-control input,
 .form-control select {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
 	width: 100%;
 	padding: 4px;
+	background:var(--secondary-background-color);
+	color: whitesmoke;
+}
 }
 
 .btn {
