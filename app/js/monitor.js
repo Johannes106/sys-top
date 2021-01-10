@@ -3,6 +3,7 @@ const osu = require("node-os-utils")
 const { cpuUsage } = require("process")
 const cpu = osu.cpu
 const mem = osu.mem
+const proc = osu.proc
 const os = osu.os
 const { ipcRenderer } = require('electron')
 
@@ -40,9 +41,9 @@ setInterval(() => {
     }
   })
 
-  //CPU free
-  cpu.free().then((info) => {
-    document.getElementById("cpu-free").innerText = info + "%"
+  //Memory free
+  mem.free().then((info) => {
+    document.getElementById("memory-free").innerText = calcFreeMemPercent(info['freeMemMb'], info['totalMemMb']) + "%"
   })
 
   //UPTIME
@@ -58,6 +59,7 @@ document.getElementById("os").innerText = `${os.type()} ${os.arch()}`
 mem.info().then((info) => {
   document.getElementById("mem-total").innerText = info.totalMemMb
 })
+
 
 // timestamp: caculate days, hours, mins, sec
 function secondsToDhms(seconds) {
@@ -91,4 +93,10 @@ function runNotify(frequency) {
   } else {
     return false
   }
+}
+
+//caculate free mem
+function calcFreeMemPercent(freeMemMb, totalMemMb) {
+  let freeMemPercent = freeMemMb*100/totalMemMb
+  return (freeMemPercent.toFixed(2))
 }
