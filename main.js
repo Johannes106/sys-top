@@ -9,6 +9,7 @@ process.env.NODE_ENV = "development";
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
+const isLinux = process.platform === "linux" ? true : false;
 
 let mainWindow;
 let tray;

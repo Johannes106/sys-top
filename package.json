@@ -1,7 +1,7 @@
 {
   "name": "sys-top",
   "productName": "SysTop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Monitor usage of CPU",
   "main": "main.js",
   "scripts": {
