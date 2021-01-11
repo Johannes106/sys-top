@@ -1,6 +1,6 @@
 {
   "dest": "release-builds/",
-  "icon": "assets/icons/Icon_1024x1024.png",
+  "icon": "assets/icons/icon.png",
   "categories": [
     "Utility"
   ],

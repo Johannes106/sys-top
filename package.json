@@ -9,8 +9,8 @@
     "dev": "nodemon --exec electron .",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=false --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"APP NAME\"",
-    "package-linux": "electron-packager . image-shrink --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/Icon_1024x1024.png --prune=true --out=release-builds",
-    "create-debian-installer": "electron-installer-debian --src release-builds/image-shrink-linux-x64/ --arch amd64 --config debian.json"
+    "package-linux": "electron-packager . sys-top --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/icon.png --prune=true --out=release-builds",
+    "create-debian-installer": "electron-installer-debian --src release-builds/sys-top-linux-x64/ --arch amd64 --config debian.json"
   },
   "keywords": [
     "Electron"
